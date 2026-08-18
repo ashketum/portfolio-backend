@@ -76,10 +76,14 @@ public class ProjectService {
                     .orElseThrow(() -> new RuntimeException("Project not found"));
 
 
-                Image image = project.getThumbnail();
+            Image image = project.getThumbnail();
+
+            if(updatedProjectDTO.getThumbnail() != null && !updatedProjectDTO.getThumbnail().isEmpty()){
                 image.setName(updatedProjectDTO.getThumbnail().getOriginalFilename());
                 image.setType(updatedProjectDTO.getThumbnail().getContentType());
                 image.setImageData(updatedProjectDTO.getThumbnail().getBytes());
+            }
+
 
            setProject(project, updatedProjectDTO, image);
             repo.save(project);
