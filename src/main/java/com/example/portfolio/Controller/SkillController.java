@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = {
-        "https://adityasantoshgupta223.github.io"
-})
+@CrossOrigin(origins = "${frontend.url}")
 @RestController
 @RequestMapping("/skills")
 public class SkillController {

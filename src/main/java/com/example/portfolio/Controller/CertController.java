@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
-@CrossOrigin(origins = {
-                "https://adityasantoshgupta223.github.io"
- })
+@CrossOrigin(origins = "${frontend.url}")
 @RestController
 @RequestMapping("/certs")
 public class CertController {
