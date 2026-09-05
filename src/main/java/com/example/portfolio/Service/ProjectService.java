@@ -2,6 +2,7 @@ package com.example.portfolio.Service;
 
 import com.example.portfolio.DTO.ProjectDTO;
 import com.example.portfolio.DTO.ProjectResponse;
+import com.example.portfolio.Exception.ResourceNotFoundException;
 import com.example.portfolio.Model.Image;
 import com.example.portfolio.Model.Project;
 import com.example.portfolio.Model.enums.ProjectType;
@@ -31,7 +32,7 @@ public class ProjectService {
     }
 
     public ProjectResponse getProjectById(Long id){
-        return repo.findProjectDetailsById(id).orElseThrow(() -> new RuntimeException("Project with id " + id + " " + "not found"));
+        return repo.findProjectDetailsById(id).orElseThrow(() -> new ResourceNotFoundException("Project with id " + id + " " + "not found"));
     }
 
     public ResponseEntity<String> addProject(ProjectDTO projectDTO){
@@ -73,7 +74,7 @@ public class ProjectService {
         try {
 
             Project project = repo.findById(projectId)
-                    .orElseThrow(() -> new RuntimeException("Project not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Project with id " + projectId + " " + "not found"));
 
 
             Image image = project.getThumbnail();
@@ -96,16 +97,19 @@ public class ProjectService {
     }
 
     public ResponseEntity<String> deleteProjectById(Long id) {
-            if(repo.existsById(id)) {
-                repo.deleteById(id);
-                return new ResponseEntity<>("Successfully Deleted this project!!", HttpStatus.OK);
-            }
-            return  new ResponseEntity<>("Resource not found", HttpStatus.NOT_FOUND);
+        if (!repo.existsById(id)) {
+            throw new ResourceNotFoundException(
+                    "Project with ID " + id + " not found"
+            );
+        }
+
+        repo.deleteById(id);
+        return new ResponseEntity<>("Successfully Deleted this project!!", HttpStatus.OK);
     }
 
 
     public ResponseEntity<byte[]> getImage(Long id) {
-        Image image = imgRepo.findById(id).orElseThrow(() -> new RuntimeException("Image with id=" + id + " not found"));
+        Image image = imgRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Image with id=" + id + " not found"));
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(image.getType()))
