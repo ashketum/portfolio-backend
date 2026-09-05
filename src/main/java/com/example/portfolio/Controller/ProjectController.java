@@ -10,7 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "${frontend.url}")
+@CrossOrigin(origins = {
+        "${frontend.url}",
+        "http://127.0.0.1:5500",
+        "http://127.0.0.1:5501"
+})
 @RestController
 @RequestMapping("/projects")
 public class ProjectController {
