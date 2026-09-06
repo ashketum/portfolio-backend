@@ -1,11 +1,11 @@
 package com.example.portfolio.Service;
 
 import com.example.portfolio.DTO.CertDTO;
+import com.example.portfolio.DTO.CertResponse;
 import com.example.portfolio.Exception.ResourceNotFoundException;
 import com.example.portfolio.Model.Cert;
 import com.example.portfolio.Model.Image;
 import com.example.portfolio.Repository.CertRepo;
-import com.example.portfolio.Repository.ImageRepo;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -28,11 +28,9 @@ public class CertService {
     @Autowired
     private CertRepo repo;
 
-    @Autowired
-    private ImageRepo imgRepo;
 
-    public List<Cert> getAllCert() {
-        return repo.findAll();
+    public List<CertResponse> getAllCert() {
+        return repo.findAllCerts();
     }
 
     private byte[] createToImage(byte[] pdfBytes) throws IOException {
@@ -53,7 +51,8 @@ public class CertService {
 
 
     public ResponseEntity<String> addCert(CertDTO certDTO) throws IOException {
-        if(certDTO.getCertName().isBlank() || certDTO.getCertPdf().getSize() == 0){
+        System.out.println(certDTO.toString());
+        if(certDTO == null || certDTO.getCertName().isBlank() || certDTO.getCertPdf().getSize() == 0){
             return new ResponseEntity<>("Missing Info", HttpStatus.BAD_REQUEST);
         }
         Image thumbnail = Image.builder()

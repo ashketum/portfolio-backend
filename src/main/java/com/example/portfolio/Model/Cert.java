@@ -23,8 +23,7 @@ public class Cert {
     @JoinColumn(name = "img_id", nullable = false)
     private Image certThumbnail;
 
-    @Lob
-    @Column(name = "cert_pdf", columnDefinition = "LONGBLOB")
+    @Column(name = "cert_pdf", columnDefinition = "BYTEA")
     private byte[] certPdf;
 
 }

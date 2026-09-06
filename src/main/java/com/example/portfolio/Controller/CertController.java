@@ -1,6 +1,7 @@
 package com.example.portfolio.Controller;
 
 import com.example.portfolio.DTO.CertDTO;
+import com.example.portfolio.DTO.CertResponse;
 import com.example.portfolio.Model.Cert;
 import com.example.portfolio.Service.CertService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,7 @@ import java.util.List;
 
 @CrossOrigin(origins = {
         "${frontend.url}",
-        "http://127.0.0.1:5500",
-        "http://127.0.0.1:5501"
+        "${admin.url}"
 })
 @RestController
 @RequestMapping("/certs")
@@ -23,7 +23,7 @@ public class CertController {
     private CertService service;
 
     @GetMapping
-    public List<Cert> getAllCert(){
+    public List<CertResponse> getAllCert(){
         return service.getAllCert();
     }
 
