@@ -2,6 +2,7 @@ package com.example.portfolio.Controller;
 
 import com.example.portfolio.DTO.ProjectDTO;
 import com.example.portfolio.DTO.ProjectResponse;
+import com.example.portfolio.Service.ImageService;
 import com.example.portfolio.Service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -21,6 +22,9 @@ public class ProjectController {
     @Autowired
     private ProjectService service;
 
+    @Autowired
+    private ImageService imgService;
+
 
     @GetMapping
     public List<ProjectResponse> getAllProject(){
@@ -32,9 +36,9 @@ public class ProjectController {
         return service.getProjectById(id);
     }
 
-    @GetMapping("/images/{id}")
-    public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
-       return service.getImage(id);
+    @GetMapping("/images/{thumbnailId}")
+    public ResponseEntity<byte[]> getImage(@PathVariable Long thumbnailId) {
+        return imgService.getImage(thumbnailId);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

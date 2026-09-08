@@ -1,6 +1,5 @@
 package com.example.portfolio.DTO;
 
-import com.example.portfolio.Model.Project;
 import com.example.portfolio.Model.enums.ProjectType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +21,4 @@ public class ProjectResponse {
         private ProjectType projectType;
         private Long thumbnailId;
 
-    public ProjectResponse(Project project) {
-    }
 }

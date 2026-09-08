@@ -56,7 +56,7 @@ public class CertService {
             return new ResponseEntity<>("Missing Info", HttpStatus.BAD_REQUEST);
         }
         Image thumbnail = Image.builder()
-                          .type("jpg")
+                          .type("image/jpeg")
                           .name(certDTO.getCertName())
                           .imageData(createToImage(certDTO.getCertPdf().getBytes()))
                           .build();

@@ -4,6 +4,7 @@ import com.example.portfolio.DTO.CertDTO;
 import com.example.portfolio.DTO.CertResponse;
 import com.example.portfolio.Model.Cert;
 import com.example.portfolio.Service.CertService;
+import com.example.portfolio.Service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,20 +23,29 @@ public class CertController {
     @Autowired
     private CertService service;
 
+    @Autowired
+    private ImageService imgService;
+
     @GetMapping
     public List<CertResponse> getAllCert(){
         return service.getAllCert();
     }
 
 
-    @PostMapping("/uploads")
-    public ResponseEntity<String> addCert(@ModelAttribute CertDTO certDTO) throws IOException {
-        return service.addCert(certDTO);
+    @GetMapping("/images/{thumbnailId}")
+    public ResponseEntity<byte[]> getImage(@PathVariable Long thumbnailId) {
+        return imgService.getImage(thumbnailId);
     }
 
     @GetMapping("/{certId}/pdf")
     public ResponseEntity<byte[]> getCertPdf(@PathVariable Long certId) {
         return service.getCertPDF(certId);
+    }
+
+
+    @PostMapping("/uploads")
+    public ResponseEntity<String> addCert(@ModelAttribute CertDTO certDTO) throws IOException {
+        return service.addCert(certDTO);
     }
 
     @PutMapping("/{certId}")
