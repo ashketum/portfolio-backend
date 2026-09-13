@@ -3,6 +3,7 @@ package com.example.portfolio.Service;
 import com.example.portfolio.DTO.ProjectDTO;
 import com.example.portfolio.DTO.ProjectResponse;
 import com.example.portfolio.Exception.ResourceNotFoundException;
+import com.example.portfolio.Model.Cert;
 import com.example.portfolio.Model.Image;
 import com.example.portfolio.Model.Project;
 import com.example.portfolio.Model.enums.ProjectType;
@@ -25,7 +26,7 @@ public class ProjectService {
     private ProjectRepo repo;
 
     @Autowired
-    private ImageRepo imgRepo;
+    private ImageService imgService;
 
     public List<ProjectResponse> getAllProject() {
         return repo.findAllProjects();
@@ -77,8 +78,8 @@ public class ProjectService {
                     .orElseThrow(() -> new ResourceNotFoundException("Project with id " + projectId + " " + "not found"));
 
 
-            Image image = project.getThumbnail();
 
+            Image image = project.getThumbnail();
             if(updatedProjectDTO.getThumbnail() != null && !updatedProjectDTO.getThumbnail().isEmpty()){
                 image.setName(updatedProjectDTO.getThumbnail().getOriginalFilename());
                 image.setType(updatedProjectDTO.getThumbnail().getContentType());
@@ -108,12 +109,17 @@ public class ProjectService {
     }
 
 
-    public ResponseEntity<byte[]> getImage(Long id) {
-        Image image = imgRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Image with id=" + id + " not found"));
+    public ResponseEntity<byte[]> getImage(Long projectId) {
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(image.getType()))
-                .body(image.getImageData());
+        Long thumbnailId = repo.findThumbnailIdByProjectId(projectId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Project with id " + projectId + " " + "not found"
+                        ));
+        ;
+
+        return imgService.getImage(thumbnailId);
+
     }
 
 

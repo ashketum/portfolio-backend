@@ -19,6 +19,5 @@ public class ProjectResponse {
         private String liveLink;
         private String apkDownloadLink;
         private ProjectType projectType;
-        private Long thumbnailId;
 
 }

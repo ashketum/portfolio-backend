@@ -15,6 +15,8 @@ public class CertDTO {
     private Long certId;
 
     private String certName;
+    private Long displayOrder;
+
     private MultipartFile certThumbnail;
 
     private MultipartFile certPdf;

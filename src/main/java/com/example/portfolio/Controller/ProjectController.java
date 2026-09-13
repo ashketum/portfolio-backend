@@ -22,9 +22,6 @@ public class ProjectController {
     @Autowired
     private ProjectService service;
 
-    @Autowired
-    private ImageService imgService;
-
 
     @GetMapping
     public List<ProjectResponse> getAllProject(){
@@ -36,9 +33,9 @@ public class ProjectController {
         return service.getProjectById(id);
     }
 
-    @GetMapping("/images/{thumbnailId}")
-    public ResponseEntity<byte[]> getImage(@PathVariable Long thumbnailId) {
-        return imgService.getImage(thumbnailId);
+    @GetMapping("{projectId}/images")
+    public ResponseEntity<byte[]> getImage(@PathVariable Long projectId) {
+        return service.getImage(projectId);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

@@ -21,8 +21,7 @@ public interface ProjectRepo extends JpaRepository<Project, Long> {
         p.repoLink,
         p.liveLink,
         p.apkDownloadLink,
-        p.projectType,
-        p.thumbnail.imgId
+        p.projectType
     )
     FROM Project p
     WHERE p.id = :id
@@ -37,8 +36,7 @@ public interface ProjectRepo extends JpaRepository<Project, Long> {
         p.repoLink,
         p.liveLink,
         p.apkDownloadLink,
-        p.projectType,
-        p.thumbnail.imgId
+        p.projectType
     )
     FROM Project p
     ORDER BY p.id DESC
@@ -46,4 +44,6 @@ public interface ProjectRepo extends JpaRepository<Project, Long> {
     List<ProjectResponse> findAllProjects();
 
 
+    @Query("SELECT p.thumbnail.imgId FROM Project p WHERE p.id = :id")
+    Optional<Long> findThumbnailIdByProjectId(Long id);
 }

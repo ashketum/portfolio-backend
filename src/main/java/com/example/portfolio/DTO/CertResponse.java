@@ -13,6 +13,5 @@ public class CertResponse {
 
     private Long certId;
     private String certName;
-    private Long certThumbnailId;
 
 }

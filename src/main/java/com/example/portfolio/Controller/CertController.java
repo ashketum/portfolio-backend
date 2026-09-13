@@ -23,8 +23,6 @@ public class CertController {
     @Autowired
     private CertService service;
 
-    @Autowired
-    private ImageService imgService;
 
     @GetMapping
     public List<CertResponse> getAllCert(){
@@ -32,9 +30,9 @@ public class CertController {
     }
 
 
-    @GetMapping("/images/{thumbnailId}")
-    public ResponseEntity<byte[]> getImage(@PathVariable Long thumbnailId) {
-        return imgService.getImage(thumbnailId);
+    @GetMapping("{certId}/images")
+    public ResponseEntity<byte[]> getImage(@PathVariable Long certId) {
+        return service.getImage(certId);
     }
 
     @GetMapping("/{certId}/pdf")
@@ -49,8 +47,8 @@ public class CertController {
     }
 
     @PutMapping("/{certId}")
-    public ResponseEntity<String> updateCert(@PathVariable Long certId, @RequestParam Cert cert) {
-        return service.updateCert(certId, cert);
+    public ResponseEntity<String> updateCert(@PathVariable Long certId, @ModelAttribute CertDTO certDTO) throws IOException {
+        return service.updateCert(certId, certDTO);
     }
 
     @DeleteMapping("/{id}")

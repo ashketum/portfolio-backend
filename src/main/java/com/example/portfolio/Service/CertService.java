@@ -15,12 +15,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CertService {
@@ -29,8 +32,11 @@ public class CertService {
     private CertRepo repo;
 
 
+    @Autowired
+    private ImageService imgService;
+
     public List<CertResponse> getAllCert() {
-        return repo.findAllCerts();
+        return repo.findAllByDisplayOrder();
     }
 
     private byte[] createToImage(byte[] pdfBytes) throws IOException {
@@ -50,8 +56,8 @@ public class CertService {
     }
 
 
+    @Transactional
     public ResponseEntity<String> addCert(CertDTO certDTO) throws IOException {
-        System.out.println(certDTO.toString());
         if(certDTO == null || certDTO.getCertName().isBlank() || certDTO.getCertPdf().getSize() == 0){
             return new ResponseEntity<>("Missing Info", HttpStatus.BAD_REQUEST);
         }
@@ -61,8 +67,12 @@ public class CertService {
                           .imageData(createToImage(certDTO.getCertPdf().getBytes()))
                           .build();
 
+        Long pos = certDTO.getDisplayOrder();
+        repo.incrementDisplayOrderFrom(pos);
+
         Cert cert = Cert.builder()
                         .certName(certDTO.getCertName())
+                        .displayOrder(pos)
                         .certThumbnail(thumbnail)
                         .certPdf(certDTO.getCertPdf().getBytes())
                         .build();
@@ -71,18 +81,48 @@ public class CertService {
         return new ResponseEntity<>("Successfully Added !!!", HttpStatus.OK);
     }
 
-    public ResponseEntity<String> updateCert(Long certId, Cert cert) {
+    @Transactional
+    public ResponseEntity<String> updateCert(Long certId, CertDTO cert) throws IOException {
 
        Cert oldCert = repo.findById(certId).orElseThrow(() ->
                new ResourceNotFoundException("Cert with CertID: " + certId + " not found"));
 
-        if(cert.getCertName().isBlank() || cert.getCertPdf().length == 0){
+        if(cert.getCertName().isBlank()){
             return new ResponseEntity<>("Missing Info", HttpStatus.BAD_REQUEST);
         }
 
-        oldCert.setCertName(cert.getCertName());
-        oldCert.setCertPdf(cert.getCertPdf());
+        Long oldPosition = oldCert.getDisplayOrder();
+        Long newPosition = cert.getDisplayOrder();
 
+        if( newPosition!= null && !Objects.equals(oldPosition, newPosition)){
+            if (newPosition < oldPosition) {
+
+                // Moving UP: 5 -> 1
+                // Shift positions 1,2,3,4 to 2,3,4,5
+                repo.shiftOrdersUp(newPosition, oldPosition);
+
+            } else {
+
+                // Moving DOWN: 1 -> 5
+                // Shift positions 2,3,4,5 to 1,2,3,4
+                repo.shiftOrdersDown(oldPosition, newPosition);
+            }
+
+        }
+
+        MultipartFile pdf = cert.getCertPdf();
+        if(pdf != null && pdf.getSize() != 0){
+            Image thumbnail = oldCert.getCertThumbnail();
+            thumbnail.setName(cert.getCertName());
+            thumbnail.setImageData(createToImage(pdf.getBytes()));
+
+            oldCert.setCertThumbnail(thumbnail);
+            oldCert.setCertPdf(pdf.getBytes());
+        }
+
+
+        oldCert.setCertName(cert.getCertName());
+        oldCert.setDisplayOrder(newPosition);
         repo.save(oldCert);
         return new ResponseEntity<>("Successfully Updated !!!", HttpStatus.OK);
     }
@@ -110,5 +150,15 @@ public class CertService {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(cert.getCertPdf());
+    }
+
+    public ResponseEntity<byte[]> getImage(Long certId) {
+        Long thumbnailId = repo.findThumbnailIdByCertId(certId)
+                .orElseThrow(() ->
+                new ResourceNotFoundException(
+                        "Cert with CertID: " + certId + " not found"
+                ));
+
+        return imgService.getImage(thumbnailId);
     }
 }

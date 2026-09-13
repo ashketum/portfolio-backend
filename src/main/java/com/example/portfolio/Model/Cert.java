@@ -19,6 +19,9 @@ public class Cert {
 
     private String certName;
 
+    @Column(nullable = false, unique = true)
+    private Long displayOrder;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "img_id", nullable = false)
     private Image certThumbnail;
